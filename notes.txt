@@ -1,1 +1,52 @@
-notes.txt
+* Todo: look through the ember source code and try to understand what it is doing
+
+scope & closures
+- nested scope
+- hoisting
+- this
+- closure
+
+scope - where to look for things
+more specifically, variables
+
+scope lookup - variable is located in memory, somewhere
+nested scopes
+
+who is looking? 
+
+JavaScript is a compiled language!! WTF?
+The compiler in JS is significantly more complex than any other language.
+
+Bash scripts and other types of interpreted scripts are definitely interpreted. They will fail in the middle. It goes top-down.
+
+JS - syntax errors! Proof that it's impossible for it to be going top-down.
+
+Let's treat the JS compiler like a person:
+
+var foo = "bar"; // first variable declaration
+
+function bar() { // 2nd declaration, a fn, still global scope
+  var foo = "baz";
+}
+
+function baz(foo) {
+  foo = "bam"; // no declaration here, no var keyword
+  bam = "yay";
+}
+
+First task of the compiler: figure out variables
+What are variable and function definitions? 
+Line 1 has first declaration. This is the global scope.
+JS treats this line like 2 separate operations that are processed
+at different times. 
+Line 3 has 2nd declaration.
+
+Scope - think of this in terms of object hashes. 
+key = scope, value = var/fn
+
+We need to recursively step into the fn and interpret
+
+JIT - just in time; when it comes across a particularly large, complex
+fn, it will defer compilation until later. It will compile just before runtime.
+
+
