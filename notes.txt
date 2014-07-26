@@ -40,6 +40,7 @@ Line 1 has first declaration. This is the global scope.
 JS treats this line like 2 separate operations that are processed
 at different times. 
 Line 3 has 2nd declaration.
+Line 8 has no declaration!! No var keyword.
 
 Scope - think of this in terms of object hashes. 
 key = scope, value = var/fn
@@ -48,5 +49,137 @@ We need to recursively step into the fn and interpret
 
 JIT - just in time; when it comes across a particularly large, complex
 fn, it will defer compilation until later. It will compile just before runtime.
+
+Looking at all the possible types a var can be, integer or string? 
+The compiler makes a guess to optimize.
+
+Hot swapping: when the compiler notices it has made an error in guessing, it will toss out the compilation then recompile
+
+10 years ago people would have laughed if you said JS could be 20 times as slow as native compiled code. Today JS is running less than 2x native code!! JS keeps getting better, beating expectations.
+
+We have compiled, now we execute.
+
+LHS - left hand side of an assignment --> target
+RHS - right hand side of an assignment --> source
+
+Scope - when we reference a variable we have to look up the scope
+"hey global scope, I have an LHS reference for a var named foo, ever heard of him?" If yes, then passed off. If not, then go fish!
+
+We find var foo in global scope. RHS is a var, so it's easy. If it were also a var, the process would continue.
+
+So we execute var (not shown). "hey scope of var, I have an LHS ref for scope of local"
+
+Variable shadowing - foo is always in local scope now
+
+Lexical lookup
+
+Scope of "baz" - I have an LHS ref for var "foo"
+in line 9 (bam = "yay") you are implicitly creating a global var, b/c there is no var declaration
+
+RUN ALL YOUR CODE IN STRICT MODE!! "use strict"; at top of program
+
+This will make your code run faster. Also it's no longer optional.
+In ES6 you can't use certain features without running in strict.
+
+In strict mode, you can't implicitly declare global vars. This is a good thing. You want the reference error that will be thrown when you try to reference a var that hasn't been declared.
+
+* undefined !== undeclared 
+
+In JS undefined is a variable, but it doesn't have a value
+Undeclared is not at all there.
+
+var foo = undefined; // this is the same 
+var foo;              // as this
+
+No we are declaring vars as a compiler:
+var foo = "bar"; // first variable declaration
+
+function bar() { // 2nd declaration, a fn, still global scope
+  var foo = "baz";
+
+  function baz(foo) {
+    foo = "bam"; // param getting set
+    bam = "yay"; // no declaration here, no var keyword
+  }
+  baz(); // not a global fn! won't behave like one, it's in scope of "bar"
+}
+
+
+bar();
+foo;
+bam;
+baz(); // reference error!
+
+compiler goes to look for a var baz in the global scope, but won't find it
+
+var foo = function bar() {
+  var foo = "baz";
+
+  function baz(foo) {
+    foo = bar;
+    foo; // fn call
+  }
+  baz();
+};
+
+foo();
+bar(); // error!
+
+Named function expression - has a name: function baz()
+
+anonymous function - no name, eg: function()
+
+* avoid anonymous fun's
+
+arguments.callee -- old school, deprecated
+
+Best, only way to reference a fn inside itself is to give it a name
+
+Use named fn expressions:
+1. b/c you can reference yourself inside your scope
+2. you get a named function in your stack trace
+3. you get a little bit of documentation b/c the name might suggest what it does
+
+IIFE - Immediately invoked function expressions - with names
+
+var foo;
+
+try {
+  foo.length;
+}
+catch(err) {  
+  console.log(err);
+}
+
+
+Lexical scope - vs - Dynamic scope
+
+Most languages use lexical scope, except Bash scripts
+Perl will allow dynamic scope
+
+JS does not have dynamic scope but has a mechanizm that behaves similarly
+
+Nested Russian dolls - function scopes are totally nested within eachother
+
+function foo() {
+  var bar = "bar";
+
+  function baz() { // here you are deciding what the scope of this fn is
+    console.log(bar);
+  }
+  baz();
+}
+foo();
+
+baz() is always nested inside of foo() - lexical scope example
+
+if you put baz() outside of foo() there is a totally different scope lookup
+
+scope is determined at author time and compile time
+
+
+
+
+
 
 
