@@ -551,5 +551,171 @@ Inheritance - the blueprint metaphor
 A class is the blueprint
 This implies copying
 
+An instance of a class will have access to its vars and methods
+
+function Foo(who) {
+  this.me = who;
+}
+Foo.prototype.identify = function() {
+  return "I am " + this.me;
+};
+
+var a1 = new Foo("a1");
+var a2 = new Foo("a2");
+
+a2.speak = function() {
+  alert("hello, " + this.identify() + ". ");
+};
+a1.constructor === Foo;
+a1.constructor === a2.constructor;
+a1.__proto__ === Foo.prototype; // "dunder" proto; a getter
+a1.__proto__ === a2.__proto__;
 
 
+// shadowing
+function Foo(who) {
+  this.me = who;
+}
+Foo.prototype.identify = function() {
+  return "I am " + this.me;
+};
+
+var a1 = new Foo("a1");
+a1.identify(); // I am a1
+
+a1.identify = function() { // this is where shadowing happens
+  alert("hello, " + Foo.prototype. identify.call(this)+".");
+};
+a1.identify(); // alerts: hello I am a1
+
+Shadowing gives you the ability to make classes
+e.g. have a very simple base class that you add to with Inheritance
+
+Super unicorn magic - this always points to the same value 
+up the inheritance chain
+
+1. what is a constructor? 
+- new in front of a fn call
+2. what is the prototype chain & where does it come from? 
+- internal linkage from one object to another by new or by object.create
+3. how does the prototype linkage affect an object?
+- method delegation
+4. how do we find out where an objects prototype points to? 3 ways
+- __proto__, Object.prototype, this.prototype
+
+Prototypal Inheritance
+======================
+
+1. how is JS prototype chain not like traditional inheritance?
+- delegation or linking rather than a copying
+2. what does prototype delegation mean and how does it describe object 
+linking in js?
+- 
+3. what are benefits of this design pattern?
+- classes are a static mechanism, they cant be changed
+- with delegation you have more flexibility
+
+Async Patterns
+==============
+
+Look at the exercises for an example of side by side comparisons &
+examples of generators & promises
+
+callbacks - why are they not sufficient
+generators
+promises
+
+// callback hell
+setTimeout(function() {
+  console.log("one");
+  setTimeout(function() {
+    console.log("two");
+    setTimeout(function() {
+      console.log("three");
+    }, 1000);
+  }, 1000);
+}, 1000);
+
+// theres another way
+function one(cb) {
+  console.log("one")
+}...etc.
+
+Inversion of Control
+====================
+handing off control in a callback; pattern used with generators
+
+Generators(yield)
+==========
+
+Run to completion semantic; 
+generators are a new type of function that doesnt have the run to completion
+semantic
+
+You can use the yield keyword to pause a fn in the middle of execution
+
+function* gen() {
+  console.log("hello");
+  yield;
+  console.log("world");
+}
+var it = gen();
+it.next(); // hello
+it.next(); // world
+
+you pause internally - it gives you an iterator
+
+how is this related to Async?
+yield - a two-way message-passing mechanism
+
+function getData(d) {
+  setTimeout(function() { run(d); }, 1000);
+}
+var run = coroutine(function*() {
+  var x = 1 + (yield getData(10));
+  var y = 1 + (yield getData(30));
+  var answer = (yield getData("meaning of life: " + (x+y)));
+  console.log(answer);
+  // meaning of life 42
+});
+
+run();
+
+Promises
+========
+
+Metaphor - You order a burger, pay, then get a #
+
+Your burger isnt ready so you have to wait for your # to be called
+
+promises are transactions that promise a future value
+'continuation events'
+
+when you call the fn it gives you a promise; an object on which you can
+register an event handler that listens for the return
+
+you call the resolved fn or rejected fn
+
+// async pattern: native promise tasks
+function getData(d) {
+  return new Promise(function(resolve, reject) {
+    setTimeout(function(){ resolve(d); }, 1000);
+  });
+}
+ 
+var x;
+get Data(10)
+.then(function(num1) {
+  x = 1 + num1;
+  return getData(30);
+})
+.then(function(num2) {
+  var y = 1 + num2;
+  return getData("Meaning of life: " + (x + y));
+})
+.then(function(answer) {
+  console.log(answer); // meaning of life 42
+});
+
+If an object is "thenable" it will give you a promise wrapper
+you can use promise.resolve
