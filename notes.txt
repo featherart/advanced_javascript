@@ -177,9 +177,94 @@ if you put baz() outside of foo() there is a totally different scope lookup
 
 scope is determined at author time and compile time
 
+ways to cheat lexical scope: eval()
+
+var bar = "bar";
+
+function foo(str) {
+  eval(str);        // cheating lexical scope
+  console.log(bar); // 42
+}
+
+foo('var bar = 42;');
+
+Here you are cheating the lexical scope at runtime!
+
+Eval is considered untrustable, etc. The real reason to hate eval:
+
+As the compiler is going through code trying to figure out where vars are declared if it runs across an eval in the code it will forgoe all the optimizations that the JS engine would have done
+
+Your code will run slower with eval()
+
+If you write compilers in JS you might produce strings of code that need to be executed. In that case eval() may be useful. Even in that case there are other options.
 
 
+2nd way of cheating lexical scope, the with keyword:
 
+var obj = {
+  a: 2, 
+  b: 3,
+  c: 4
+};
 
+obj.a = obj.b + obj.c;
+obj.c = obj.b - obj.a;
+ 
+with( obj) {  // here we're either accidentally creating globals 
+              // or overriding
+  a = b + c;
+  c = b - a;
+  d = 3; // look!
+}
 
+obj.d; // undefined
+d; // 3 -- oops
 
+"with" will always make your code run more slowly too
+Strict mode allows "with" and "eval", however it will limit the scope
+doesn't allow eval to modify existing scope - this is a performance feature
+
+IIFE - phrase coined by Ben Almon
+
+var foo = "foo";
+
+(function() {
+  var foo = "foo2";
+  console.log(foo);
+})();
+
+console.log(foo);
+
+We are trying to prevent ourselves from modifying the existing environment
+this anonymous fn does not pollute the enclosing scope
+
+b/c it has a parenthesis - other things will do - this adds it to the expression stack, the last () executes it
+
+we've immediately executed it so it doesn't pollute the scope
+
+return values that dont get assigned get thrown out
+
+Block Scope
+===========
+
+If you are declaring vars across your fn's you will have scope issues
+
+Principle of Priviledge or of Least Exposure
+
+Means that you declare your vars in the smallest scope possible
+
+ex - the i in a for loop
+
+In ES6 you get the "let" keyword
+
+function foo() {
+  var bar = "bar";
+  for (let i = 0; i < bar.length; i++) {
+    console.log(bar.charAt(i));
+  }
+  console.log(i);
+}
+
+foo();
+
+Yipes - some are saying "let" is the new "var"
