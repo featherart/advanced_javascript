@@ -719,3 +719,30 @@ get Data(10)
 
 If an object is "thenable" it will give you a promise wrapper
 you can use promise.resolve
+
+Promises solve trust issues
+
+https://github.com/getify/asynquence
+
+asynquence.js - library created to automatically chain promises
+less boilerplate so its easier to work with promises
+
+generators + promises
+
+generators dont have solution to inversion of control problem
+yield promise
+
+1. what is callback hell? why do callbacks suffer from inversion of control?
+- inversion of control trust issue
+- 
+2. how do you pause a generator? how do you resume?
+- yield
+- .next
+3. what is a promise? 
+- a reciept
+4. how does a promise resolve the inversion of control issue?
+- we have to wait for the response but we control what happens next
+5. how do we combine promises and generators for flow control?
+- yield out a promise from a generator
+
+
