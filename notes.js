@@ -429,8 +429,127 @@ foo.apply // only takes one extra param
 
 With ES6 you get the (..) iterator!
 
-Closures
+Closures - shared scope
 ========
 
 definition - when a fn remembers its lexical scope 
 even if it is executing outside of it
+
+function foo() {
+  var bar = "bar";
+
+  function baz() {
+    console.log(bar);
+  }
+
+  bam(baz);
+}
+function bam(baz) {
+  baz();
+}
+foo();
+
+function foo() {
+  var bar = "bar";
+
+  setTimeout(function() { // inner fn closes over var bar
+    console.log(bar);     // so it keeps access to it
+  }, 1000);
+}
+foo();
+
+cannonical example of closure:
+
+for (var i = 1; i <= 5; i++) {
+  setTimeout(function() {
+    console.log("i: " + i); // i is always 6
+  }, i * 1000);
+}
+
+Or w/ an IIFE:
+
+for( var i = 1; i <=5; i++ ) {
+  (function(i) {
+    setTimeout(function() {
+      console.log("i: " + i); // i is 1, 2, 3...6
+    }, i*1000);
+  })(i);
+}
+
+The Module Pattern: 
+1. there must be an outer enclosing fn to create some scope
+2. you must return at least an inner fn
+
+var foo = (function() {
+  var o = { bar: "bar" };
+
+  return {
+    bar: function() {
+      console.log(o.bar);
+    }
+  };
+})();
+foo.bar();
+
+jQuery just returns the inner fn, calls it $
+
+Best practice: create a module, give it a name related to that task
+treat the module like a namespace
+
+This is a good example, using define:
+
+define("foo", function() {
+  var o = { bar: "bar" };
+
+  return {
+    bar: function() {
+      console.log(o.bar);
+    }
+  };
+});
+
+foo.js:
+var o = { bar: "bar" };
+export function bar() {
+  return o.bar;
+}
+
+otherthing.js:
+import bar from "foo";
+bar(); // "bar"
+
+// making an API
+var foo = (function() {
+  var publicAPI = {
+    bar: function() {
+      publicAPI.baz();
+    },
+    baz: function() {
+      console.log("baz");
+    }
+  };
+})
+
+1. whats a closure & how created? 
+A - a fn creates a reference to lexical scope and keeps reference to it
+2. how long does a scope thats been closed over stay around?
+- as long as its needed
+3. why doesnt a fn callback inside a loop behave as expected? how to fix?
+- use IIFE or 'let'
+4. how do you use a closure to create an encapsulated module? benefits?
+- inner fn has closure, so that creates encapulation
+
+Object-Orienting
+================
+
+Using prototypes
+Inheritance vs/ Behavior Delegation or OO vs/ OLOO (Objects linked to other objects)
+
+Every single object is built by a constructor call - e.g. new keyword
+
+Inheritance - the blueprint metaphor
+A class is the blueprint
+This implies copying
+
+
+
